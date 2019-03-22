@@ -1,0 +1,24 @@
+{
+  "name": "remotecoworkserver",
+  "version": "1.0.0",
+  "description": "Messaging server for remote cowork platform",
+  "main": "index.js",
+  "scripts": {
+    "serve": "nodemon ./src/index.js"
+  },
+  "keywords": [
+    "nodejs",
+    "websocket",
+    "socket.io",
+    "Jimber"
+  ],
+  "author": "Ivan coene <ivan.coene@jimber.org>",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "cors": "^2.8.5",
+    "express": "^4.15.2",
+    "lodash": "^4.17.11",
+    "socket.io": "^2.2.0"
+  }
+}
