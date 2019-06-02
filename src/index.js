@@ -45,7 +45,7 @@ app.route('/users/:name').get((req, res) => {
   var wanted = users.getUserByName(req.params.name)
   if (!wanted) {
     console.log('CANT FIND USER ' + req.params.name)
-    res.status(404).send(`I did my best but couldn't find user ${req.params.name}, sorry`)
+    res.status(404).send(`user not found`)
   } else {
     console.log(wanted)
     res.json({
@@ -82,7 +82,7 @@ app.route('/users/:name/streams').put((req, res) => {
   console.log(`>> addStreams`)
 
   var wanted = users.getUserByName(req.params.name)
-  if (!wanted) res.send(404, `I looked everywhere but ${req.params.name} wasn't there`)
+  if (!wanted) res.send(404, `user not found`)
   if (!req.body || isEmpty(req.body)) res.send(400, `I have no body, only arms and legs`)
   var key = Object.keys(req.body)[0]
 
@@ -220,6 +220,7 @@ io.on('connection', socket => {
     if (user) {
       const message = new Message(user.name, newMessage.to, newMessage.body, newMessage.type, newMessage.channel)
       console.log(`${message.time}: New message from ${user.name}: ${JSON.stringify(message)}`)
+      console.log(message.body);
       const correspondent = users.getUserByName(message.to)
       if (correspondent.isOffline) delayedMessage.push(message)
       else io.to(correspondent.socket).emit('message', message)
