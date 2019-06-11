@@ -182,6 +182,20 @@ io.on('connection', socket => {
     console.log(``)
   })
 
+  socket.on('pingAdmins', data => {
+    console.log(``)
+    console.log(`pingAdmins`)
+    teamname = data.teamname;
+    admins = getTeamAdmins(teamname);
+    multicast(data.username, admins, "ping", "ping")
+  });
+
+  socket.on("pongAdminRequest", data => {
+    console.log(``)
+    console.log(`pongAdminRequest`)
+  })
+
+
   socket.on('requestSymKey', data => {
     console.log(``)
     console.log(`>> requestSymKey`)
@@ -231,11 +245,11 @@ io.on('connection', socket => {
     console.log(``)
     console.log(`>> signal`)
     if (user) {
-      console.log(`============= ${JSON.stringify(user)} ======== ${JSON.stringify(newMessage)}`)
+      console.log(`============= ${JSON.stringify(user.name)} ======== ${JSON.stringify(newMessage)}`)
       const message = new Message(user.name, newMessage.to, newMessage.body, newMessage.type, newMessage.channel)
-      console.log(`New signal from ${JSON.stringify(user)}: ${JSON.stringify(message)}`)
+      console.log(`New signal from ${JSON.stringify(user.name)}: ${JSON.stringify(message)}`)
       const correspondent = users.getUserByName(message.to)
-      console.log(`Found correspondent ${JSON.stringify(correspondent)}`)
+      console.log(`Found correspondent ${JSON.stringify(correspondent.name)}`)
       if (correspondent) {
         if (correspondent.isOffline) delayedSignal.push(message)
         else io.to(correspondent.socket).emit('signal', message)
@@ -328,4 +342,22 @@ function isEmpty (obj) {
     if (obj.hasOwnProperty(key)) { return false }
   }
   return true
+}
+
+function getTeamAdmins(teamname) {
+  team = teams.find(t => t.name.toLowerCase() === teamname.toLowerCase())
+  return team.admins;
+}
+
+
+function multicast(from, userList, msg, type) {
+  userList.forEach(user => {
+    var message = new Message(from, user, msg, type)
+    cast(message);
+  });
+
+}
+function cast(message) {
+  console.log("cast", message)
+  io.to(users.getUserByName(message.to.name).socket).emit('signal', message)
 }
