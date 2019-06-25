@@ -199,7 +199,6 @@ io.on('connection', socket => {
   socket.on('requestSymKey', data => {
     console.log(``)
     console.log(`>> requestSymKey`)
-    console.log(data)
     const me = users.getUserBySocketID(socket.id)
     if (data.teamname && teams && teams.length) {
       var team = teams.find(t => t.name.toLowerCase() === data.teamname.toLowerCase())
@@ -358,6 +357,5 @@ function multicast(from, userList, msg, type) {
 
 }
 function cast(message) {
-  console.log("cast", message)
   io.to(users.getUserByName(message.to.name).socket).emit('signal', message)
 }
