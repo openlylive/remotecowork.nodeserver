@@ -200,14 +200,14 @@ io.on('connection', socket => {
     console.log(``)
     console.log(`>> requestSymKey`)
     const me = users.getUserBySocketID(socket.id)
-    if (data.teamname && teams && teams.length) {
-      var team = teams.find(t => t.name.toLowerCase() === data.teamname.toLowerCase())
+    if (data.teamName && teams && teams.length) {
+      var team = teams.find(t => t.name.toLowerCase() === data.teamName.toLowerCase())
       if (team) {
-        console.log(`Serching for team ${data.teamname} found ${JSON.stringify({ name: team.name, admins: team.admins.map(x => x.name) })}`)
-        console.log(`${me.name} is requesting access to ${data.teamname} to ${JSON.stringify(team.admins.map(x => x.name))}`)
+        console.log(`Serching for team ${data.teamName} found ${JSON.stringify({ name: team.name, admins: team.admins.map(x => x.name) })}`)
+        console.log(`${me.name} is requesting access to ${data.teamName} to ${JSON.stringify(team.admins.map(x => x.name))}`)
         if (team.admins && team.admins.length && me && !team.admins.some(x => x.name === me.name)) {
           team.admins.filter(x => x.name !== me.name).forEach(admin => {
-            const message = new Message(me.name, admin.name, data, 'requestSymKey', null)
+            const message = new Message(me.name, admin.name, data, 'requestSymKey', data.teamName)
             const correspondent = users.getUserByName(message.to)
             if (correspondent && correspondent.isOffline) delayedSignal.push(message)
             else if (correspondent) io.to(correspondent.socket).emit('signal', message)
@@ -219,7 +219,7 @@ io.on('connection', socket => {
       }
     } else {
       console.log(`data.teamname && teams && teams.length is false`)
-      console.log(data.teamname)
+      console.log(data.teamName)
       console.log(teams)
     }
     console.log(`<< requestSymKey`)
@@ -245,10 +245,10 @@ io.on('connection', socket => {
     console.log(`>> signal`)
     if (user) {
       console.log(`============= ${JSON.stringify(user.name)} ======== ${JSON.stringify(newMessage)}`)
-      const message = new Message(user.name, newMessage.to, newMessage.body, newMessage.type, newMessage.channel)
+      const message = new Message(user.name, newMessage.to, newMessage.body, newMessage.type, newMessage.teamName)
       console.log(`New signal from ${JSON.stringify(user.name)}: ${JSON.stringify(message)}`)
       const correspondent = users.getUserByName(message.to)
-      console.log(`Found correspondent ${JSON.stringify(correspondent.name)}`)
+      // console.log(`Found correspondent ${JSON.stringify(correspondent.name)}`)
       if (correspondent) {
         if (correspondent.isOffline) delayedSignal.push(message)
         else io.to(correspondent.socket).emit('signal', message)
